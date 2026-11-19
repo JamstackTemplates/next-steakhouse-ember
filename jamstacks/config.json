@@ -1,0 +1,19 @@
+{
+  "name": "Ember steakhouse",
+  "description": "A premium charcoal-and-ember steakhouse with editable cuts, weights and prices, a doneness guide, wine pairings, opening hours and location, and a Jamstacks contact component for reservation and private dining enquiries.",
+  "tech": "next",
+  "type": "steakhouse",
+  "style": "ember",
+  "internal": false,
+  "components": [
+    "support-form"
+  ],
+  "configFile": "site.config.json",
+  "screenshots": {
+    "light": "jamstacks/home-light.jpg",
+    "dark": "jamstacks/home-dark.jpg",
+    "theme": {
+      "strategy": "media"
+    }
+  }
+}

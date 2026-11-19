@@ -1,29 +1,21 @@
-# JamstackTemplates Next.js starter
+# Cinder & Vesper — `next-steakhouse-ember`
 
-The shared starter for Next.js templates in the `JamstackTemplates` organization. Its canonical home is
-`JamstackTemplates/template-next`, alongside the templates generated from it.
-It is not a gallery design or a published demo. Business content is sample content. No application code
-in a generated website depends on this starter directory or the portal repository.
+An editorial charcoal-and-ember steakhouse website template built with Next.js static export, React, TypeScript and Tailwind CSS v4. Designed around a **butcher’s cut ledger**, it pairs an **Ash linen** light palette and **Banked coals** dark palette with token-coloured cut silhouettes, a five-step culinary doneness guide, cellar and alcohol-free pairings, live time-zone-aware opening status, keyless Google Maps links and a Jamstacks support-form integration for reservation and private dining enquiries.
 
-## Start a template
+> **Sample content notice:** **Cinder & Vesper**, its menu, prices, pairings, phone number (`(212) 555-0148`), email (`hello@example.com`) and weekly service hours are entirely fictitious sample data created for this template. **20 Times Square, New York, NY 10036** is used solely as a public landmark placeholder for map links and embeds—never suggest that it houses this restaurant. Replace all sample business details, menu items, hours and the demo address before publishing a real website.
 
-Node 24 or later and npm are required. From this directory:
+## Pages
 
-```sh
-node scripts/create.mjs ../next-steakhouse-ember \
-  --id next-steakhouse-ember --name "Cinder & Vesper" \
-  --description "An illustrated steakhouse with editable cuts and reservation enquiries."
-```
+| Route | Purpose |
+| --- | --- |
+| `/` | Opening cut ledger with featured cut diagram, Find us spread (`#find-us`), supporting food highlights, five-step doneness guide, pairing annotations, story & private dining inset, six native `<details>` FAQs and `Restaurant` JSON-LD |
+| `/menu/` | Full dinner menu with sticky wrapping course index, cut ledger (weight, serves, marbling, bone-in/boneless, price and pairing links), vegetable main, supporting courses, `#doneness` guide, `#pairings` cellar list and dietary/weight notes |
+| `/contact/` | Reservation & private dining enquiries with the hosted `<jamstacks-support-form>` when configured, or a clean direct-email fallback when unconfigured; email and telephone remain visible at all times |
+| `/404.html` | Friendly static error page (“This cut isn’t on the menu.”) with navigation back to Home, Menu and Contact |
 
-The destination folder must match `next-type-style`. The generator copies source and lockfile, sets the
-package/business names, config description/domain (`<id>.jamstacks.net`) and gallery manifest. It skips
-`.git`, dependencies, local environment files and build output. Existing unrelated files (including a
-PLAN.md or repository metadata) are preserved. Any colliding file aborts preflight before copying; move
-or reconcile an initial README deliberately first. Files are never overwritten. Source/destination
-symlinks and recursive destinations are rejected. The generator does not install dependencies, create
-repositories, commit, change Pages settings or deploy. Installing those settings is a separate step.
+## Quick start
 
-Then, in the generated project:
+Node 24 or later and npm are required:
 
 ```sh
 npm ci
@@ -31,146 +23,183 @@ npm run check
 npm run dev
 ```
 
-Write/review PLAN.md using the portal's PROMPT_PLAN.md and PROMPT_TEMPLATE.md, then implement its
-business model and visual identity. The starter replaces their infrastructure-copy step; industry
-requirements, dependency review, unique design, content tests and publishing checks still apply.
-Do not copy the starter's neutral composition into every design.
+Preview the static export locally (including optional project base-path testing):
 
-## Pages
-
-| Route | Purpose |
-| --- | --- |
-| `/` | Minimal content-driven home page and Organization JSON-LD |
-| `/contact/` | Hosted support form when configured; visible email alternative |
-| `/404.html` | Friendly static error page |
+```sh
+npm run build
+npm start -- --port 3000
+```
 
 ## Make it yours
 
-| File | Owns |
+Most owner updates are pure data edits in `content/` and never require touching React components:
+
+| File | What it owns |
 | --- | --- |
-| `content/business.ts` | Name, introduction, contact details and enquiry copy |
-| `content/menu.ts` or `content/services.ts` (add when needed) | Industry-specific typed collections |
-| `site.config.json` | Public name, description, hostname, optional timeZone and Jamstacks integration |
-| `app/tailwind.input.css` | Theme tokens, utility mappings and small shared styles |
-| `components/site-header.tsx`, `site-footer.tsx` | Replaceable navigation and visual shell |
-| `lib/structured-data.ts` | Schema type/properties derived from real content |
-| `app/sitemap.ts` | Public routes; update when adding a page |
+| `content/business.ts` | Business name, tagline, introduction, email, phone, story paragraphs, address & map query, directions, seven-day `openingHours`, service notice, amenities, private-dining copy, six visitor FAQs and Contact enquiry guidance |
+| `content/menu.ts` | Currency/locale, `featuredCutId`, dinner courses (`first-course`, `cuts`, `from-the-garden`, `sides-and-sauces`, `last-course`), cut details (`art`, `weightOz`, `serves`, `marbling`, `boneIn`, `pairingId`), `pairings` and `donenessGuide` |
+| `site.config.json` | Public site `name`, `description`, `domain`, IANA `timeZone` and `jamstacks` integration settings |
+| `app/tailwind.input.css` | Light (`Ash linen`) and dark (`Banked coals`) colour tokens, `@theme inline` utility mappings, typography variables and shared ledger styles |
+| `components/cut-art.tsx` | Token-coloured SVG cut silhouettes (`ribeye`, `strip`, `fillet`, `porterhouse`, `flat-iron`, `short-rib`, `vegetable`), wine-glass glyph, coal-notch mark and doneness cross-sections |
+| `lib/structured-data.ts` | `schema.org/Restaurant` JSON-LD derived automatically from `content/business.ts` and `content/menu.ts` |
+| `app/sitemap.ts` | Public static routes (`/`, `/menu/`, `/contact/`) |
 
-For example, change `business.email` to update Contact. Rename in `business.name` and
-`site.config.json.name`. Add a typed core-content file for frequent owner edits: a food menu should use
-the existing sections/items/price/availability model; changes such as sold out, seasonal or a new section
-should be data edits with actionable content tests. Do not add business content to configuration: the
-Jamstacks provisioner replaces that file wholesale, possibly adding `provisioningId`.
+### Worked example: repricing a cut, marking a cut unavailable, and switching the hero cut
 
-## Appearance and optional local-business features
+Open `content/menu.ts`. To **reprice the ribeye**, **mark the New York strip temporarily unavailable** (which keeps it visible in the ledger with an explicit `Currently unavailable` badge rather than deleting it), and **promote the porterhouse to the home page hero**, update `featuredCutId` and the items in the `cuts` section:
 
-The starter uses system fonts, neutral Tailwind v4 tokens and the published `jamstacks` package's
-ThemeProvider, ThemeScript and DarkModeToggle. No font download or font licence file is needed for
-system fonts. Each designed template chooses and documents self-hosted font packages and their licences.
-Utilities live in components; colours originate in CSS tokens with light, automatic-dark and explicit-dark
-values plus `@theme inline` mappings. Keep the hosted form's primary fill dark enough for white text.
-Keyboard focus, reduced motion and print styles are included. The footer credit is yours to keep,
-reword or remove.
+```ts
+export const menu: Menu = {
+  currency: 'USD',
+  locale: 'en-US',
+  // 1. Choose any available cut ID from the `cuts` section as the Home hero entry:
+  featuredCutId: 'porterhouse',
+  sections: [
+    // ...
+    {
+      id: 'cuts',
+      title: 'The cut ledger',
+      description: 'Seared over banked white-oak coals and rested before carving.',
+      items: [
+        {
+          id: 'ribeye',
+          name: 'Ribeye',
+          description: 'Generous spinalis cap and rich intramuscular marbling...',
+          // 2. Reprice the ribeye portion from 58 to 62:
+          price: 62,
+          diet: ['gluten-free-ingredients', 'dairy-free-ingredients'],
+          badge: 'signature',
+          available: true,
+          featured: true,
+          cut: {
+            art: 'ribeye',
+            weightOz: 14,
+            serves: 1,
+            marbling: 'rich',
+            boneIn: false,
+            pairingId: 'cabernet-blend',
+          },
+        },
+        {
+          id: 'new-york-strip',
+          name: 'New York strip',
+          description: 'Evenly marbled short-loin cut with a crisp outer fat cap...',
+          price: 49,
+          // 3. Mark temporarily unavailable without removing the item:
+          available: false,
+          featured: false,
+          cut: {
+            art: 'strip',
+            weightOz: 12,
+            serves: 1,
+            marbling: 'balanced',
+            boneIn: false,
+            pairingId: 'crisp-white',
+          },
+        },
+        // ...
+      ],
+    },
+  ],
+  // ...
+};
+```
 
-For a business with visiting hours, add address/directions/hours to typed content, set the IANA `timeZone`
-in site.config.json and use optional `GoogleMap`, `TimeZoneNote` and `OpenBadge` components. GoogleMap
-accepts an address and descriptive title; map helpers need no key. `OpenBadge` accepts seven
-`OpeningHours` records, uses the business zone and refreshes each minute in the browser; static/no-JS
-output is neutral. Same-day intervals only: overnight hours fail validation and need a tested extension
-before use. The baseline home page does not load a map or assert opening hours.
+### Common content tasks
 
-## Public configuration
+- **Mark an item or wine pairing unavailable:** Set `available: false` on the `MenuItem` or `Pairing`. It stays in the ledger with an explicit `Currently unavailable` tag. If you mark the current hero cut (`menu.featuredCutId`) unavailable, `npm test` will fail with an actionable message reminding you to set `menu.featuredCutId` to an available cut, and remind you to keep `featured: true` only on 1–3 available supporting highlights.
+- **Seasonal badge:** Set `badge: 'seasonal'` (or `'signature'` / `'new'`) on any `MenuItem`. Badges are manual editorial markers, never calendar-driven logic.
+- **Add a new section or dish:** Add a `MenuSection` to `menu.sections` with a unique URL-safe `id` (lowercase words joined by hyphens). Items in the `cuts` section must include a `cut` object (`art`, `weightOz`, `serves`, `marbling`, `boneIn`, `pairingId`) and a single numeric portion `price`; items in other sections must omit `cut`.
+- **Rename the business:** Change `name` in both `content/business.ts` and `site.config.json`.
+
+## Opening hours, time zone and location
+
+- **Weekly hours:** Edit `business.openingHours` in `content/business.ts`. Every weekday (`Monday` through `Sunday`) appears once. Omit `opens` and `closes` for a closed day (such as Monday), or supply same-day `HH:MM` 24-hour times (`17:00` to `22:00`). Overnight intervals past midnight are intentionally rejected by `validateHours()`.
+- **Time zone:** Set the IANA `timeZone` in `site.config.json` (default `"America/New_York"`). `OpenBadge` computes `"Open now · until 22:00"` or `"Closed · opens Tuesday at 17:00"` in the browser using the restaurant’s time zone and refreshes every minute. Static HTML and no-JS views always render the neutral label `"See opening hours"`.
+- **Map & directions:** Edit `business.address` in `content/business.ts`. Keep `business.address.mapQuery` in sync with the formatted address. `lib/maps.ts` builds keyless Google Maps search, directions and lazy-loaded iframe embed URLs with no API key required.
+
+## Appearance, fonts and Tailwind CSS v4
+
+- **Palette:** Light mode is **Ash linen** (`#F2EDE3` background, `#FAF7F0` surface, `#241D18` ink, `#923A20` primary accent, `#9C3F22` ember) and dark mode is **Banked coals** (`#141311` background, `#201D19` surface, `#F3E9DC` ink, `#AC4227` primary accent, `#F19B61` ember). Theme preference follows the visitor’s device by default and can be toggled in the header via `DarkModeToggle`.
+- **Adding or changing colours:** All colours live in `app/tailwind.input.css`. Update or add a CSS variable in all three blocks (`:root`, `@media (prefers-color-scheme: dark) { :root:not(.light) }`, and `:root.dark`) and map it in `@theme inline` so utility classes and SVG fills switch automatically without scattering `dark:` overrides across components.
+- **Self-hosted fonts and licences:**
+  - `@fontsource-variable/oswald` (`Oswald Variable`, used for condensed ledger headings, numbers and buttons) — licensed under the **SIL Open Font License, Version 1.1 (OFL-1.1)** (`node_modules/@fontsource-variable/oswald/LICENSE`).
+  - `@fontsource-variable/public-sans` (`Public Sans Variable`, used for body copy, navigation and descriptions) — licensed under the **SIL Open Font License, Version 1.1 (OFL-1.1)** (`node_modules/@fontsource-variable/public-sans/LICENSE`).
+  - Both fonts are bundled locally from npm so builds and visitors never make external font requests.
+- **Footer credit:** The `jamstacks.net` credit in `components/site-footer.tsx` is yours to keep, reword or remove on your own website.
+
+## Public configuration (`site.config.json`)
 
 ```json
 {
-  "name": "Business name",
-  "description": "Public description",
-  "domain": "next-business-minimal.jamstacks.net",
+  "name": "Cinder & Vesper",
+  "description": "A premium charcoal-and-ember steakhouse with editable cuts, weights and prices, a doneness guide, wine pairings, opening hours and location, and a Jamstacks contact component for reservation and private dining enquiries.",
+  "domain": "next-steakhouse-ember.jamstacks.net",
   "timeZone": "America/New_York",
-  "jamstacks": { "siteId": "", "cdnUrl": "https://cdn.jamstacks.net" }
+  "jamstacks": {
+    "siteId": "",
+    "cdnUrl": "https://cdn.jamstacks.net"
+  }
 }
 ```
 
-The starter itself leaves domain/timeZone unset. Generated templates use their folder name plus
-`.jamstacks.net`; customers replace the demo domain with their own. Do not invent canonical URLs when
-the deployed address is unknown.
+Replace `"domain": "next-steakhouse-ember.jamstacks.net"` with your own production hostname (e.g. `"cinderandvesper.com"`). Never store menu or business content in `site.config.json`—the Jamstacks provisioner rewrites that file wholesale.
 
 | Environment variable | Public build-time meaning |
 | --- | --- |
 | `JAMSTACKS_SITE` | Website ID; blank retains file default, absent ID gives email fallback |
 | `NEXT_PUBLIC_JAMSTACKS_CDN_URL` | CDN asset base; default `https://cdn.jamstacks.net` |
-| `NEXT_PUBLIC_SITE_DOMAIN` | Hostname overriding config domain |
-| `SITE_TIME_ZONE` | IANA zone overriding config timeZone |
-| `PAGES_BASE_PATH` | Project path such as `/preview`; blank for custom domain/root |
+| `NEXT_PUBLIC_SITE_DOMAIN` | Hostname overriding config `domain` |
+| `SITE_TIME_ZONE` | IANA zone overriding config `timeZone` |
+| `PAGES_BASE_PATH` | Project path such as `/steakhouse-preview`; blank for custom domain/root |
 | `PAGES_BASE_URL` | Actual Pages origin and path; takes precedence for canonical URLs |
-| `JAMSTACKS_ALLOW_LOCAL_CDN` | Explicit localhost-only testing opt-in; disallowed in Actions |
+| `JAMSTACKS_ALLOW_LOCAL_CDN` | Explicit localhost-only testing opt-in; disallowed in GitHub Actions |
 
-Copy .env.example to .env.local for Next.js local work. All listed values are public. Never add tokens,
-SMTP credentials or publishing keys. Newer dependencies should stay within reviewed majors; update
-package.json and package-lock.json together, then run the full checks.
+## Contact and reservation enquiry limits
 
-## Contact contract
+- The Contact page (`app/contact/page.tsx`) is for **reservation & private dining enquiries**, not instant table booking, live inventory or online payment. Copy states clearly that arrangements are confirmed only when the restaurant replies.
+- When `jamstacks.siteId` (or `JAMSTACKS_SITE`) is configured, Contact renders `<jamstacks-support-form>` and loads one `{cdn}/sites/{siteId}/embed.js` bootstrap script. The hosted runtime owns the name, email and message fields, validation and submission status.
+- When no site ID is configured, Contact makes zero script requests and displays the direct email prompt (`Email hello@example.com with your enquiry. Arrangements are confirmed only by reply.`). Email and phone stay visible in both states.
+- Links to and from `/contact/` use full-document navigation (`SiteLink`) so the hosted component mounts cleanly on every visit.
 
-The real `<jamstacks-support-form>` host and one `{cdn}/sites/{siteId}/embed.js` bootstrap appear only
-on Contact when configured. Without a site ID there is no embed host/request. Email remains visible
-in either case. The hosted runtime owns name/email/message fields, validation, submission and results.
-Never register the element locally, substitute a form or intercept submission. Contact navigation uses
-full document loads via SiteLink because the runtime has no remount API. Copy must describe an enquiry,
-not a confirmed booking/order/payment; no attachments or extra input fields.
+### Local Jamstacks component development
 
-For local Jamstacks development, configure an explicit local CDN URL and
-`JAMSTACKS_ALLOW_LOCAL_CDN=1`; remote builds reject localhost. A locally loaded component does not prove
-real message delivery. Test delivery separately against a configured site/backend.
-
-## Checks and preview
-
-```sh
-npm run check
-PAGES_BASE_PATH=/preview PAGES_BASE_URL=https://owner.github.io/preview npm run build
-npm start -- --base /preview --port 3000
-```
-
-Tests cover config/provisioner compatibility, embed state, content rules, optional opening hours,
-structured-data escaping and generator preservation. Typecheck uses Next's generated route types.
-After a configured-contact build, `npm run verify:export` checks the embed appears only on Contact
-and verifies base-path/canonical metadata. Run it for both configured and unconfigured builds.
-Use `PAGES_BASE_PATH`, `PAGES_BASE_URL` and `JAMSTACKS_SITE` consistently for build and verification.
-Test light/dark at desktop and mobile widths, keyboard navigation, unknown routes, repeated Contact
-navigation and any added browser interactions. Return to a normal build before capturing final assets.
-
-## GitHub Pages deployment
-
-The generated repository must place this starter's contents at its root. `.github/workflows/pages.yml`
-uses npm ci, tests, typecheck and static export; it preserves Jamstacks' `provisioning_id` dispatch input
-and correlated run name. It builds pull requests without deploying, and publishes main/manual runs.
-Configure Pages to use GitHub Actions and set its custom domain to the same value as site.config.json.
-DNS is managed separately; for template demos the CNAME targets `jamstacktemplates.github.io`.
-Do not add public/CNAME. Enable HTTPS after the certificate is ready. This starter performs no remote setup.
+To test against a local Jamstacks CDN server during development, set `NEXT_PUBLIC_JAMSTACKS_CDN_URL` to your local origin and opt in with `JAMSTACKS_ALLOW_LOCAL_CDN=1`. GitHub Actions builds always reject localhost CDN URLs.
 
 ## Content Security Policy
 
-A host-level CSP must permit same-origin Next.js scripts/assets, the inline theme bootstrap (using an
-appropriate hash/nonce policy), the configured Jamstacks CDN scripts/assets and the published form's
-API connection origin. Derive actual directives from the deployed component. Optional maps require
-`frame-src https://www.google.com`. Apply CSP at the host; static export cannot set response headers
-through a running Next.js server. Do not put private credentials into CSP or relax policies blindly.
+If you configure a host-level Content Security Policy, allow:
 
-## Publishing assets and structure
+- `script-src`: `'self'`, the inline theme bootstrap script hash/nonce, and your configured Jamstacks CDN origin (`https://cdn.jamstacks.net`) when the support form is enabled.
+- `connect-src`: `'self'` and the Jamstacks support-form API origin when enabled.
+- `frame-src`: `https://www.google.com` for the keyless Google Maps iframe in `#find-us`.
+- `style-src` / `font-src` / `img-src`: `'self'` (all fonts and SVGs are self-hosted).
 
-`app/`, `components/`, `content/`, `lib/` and `types/` are the website; `scripts/` supplies static preview,
-generation and verification; `tests/` covers customer behavior; `.github/` supplies deployment.
-`jamstacks/` is removable gallery-only source metadata. Ordinary builds, tests and Pages work after
-it is deleted. The starter intentionally has no gallery config or captures. The generator writes a
-manifest; create genuine screenshots before running its separate publishing test:
+## GitHub Pages deployment
 
-```sh
-node /home/mythz/src/mythz/jamstacks.net/tools/template-screenshots/capture.mjs \
-  --template /path/to/next-type-style --modes light,dark --executable /usr/bin/chromium
-node --test jamstacks/config.test.mjs
+`.github/workflows/pages.yml` runs `npm ci`, `npm test`, `npm run typecheck` and `npm run build`, then deploys `out/` to GitHub Pages on pushes to `main` or manual `workflow_dispatch` runs (preserving the `provisioning_id` input and correlated run name). In your repository’s Pages settings, select **GitHub Actions** as the build source and set the custom domain to match `site.config.json`'s `domain`. Do not add a `public/CNAME` file.
+
+## Project structure
+
+```text
+app/                  Next.js App Router pages (/ , /menu/ , /contact/ , 404, icon, sitemap, robots)
+components/           Header, footer, page head, cut & doneness SVG art, map, open badge, support form
+content/              Typed editable business profile (business.ts) and menu/cuts/pairings (menu.ts)
+lib/                  Build-time config, hours, keyless maps, base-path helpers and Restaurant JSON-LD
+scripts/              Static preview server (serve.mjs) and export verification (verify-export.mjs)
+tests/                Node test suite for config, content, hours, embed status and template generation
+jamstacks/            Removable gallery metadata and screenshots (not used by the website at runtime)
 ```
 
-Before publication: replace neutral content and shell; validate industry data/schema and all links;
-choose licensed fonts; verify both themes/base-path/embed states; create a neutral 1200×630 public/og.png
-from the finished design and wire metadata; replace the icon; generate gallery captures and validate;
-confirm domain/Pages settings and HTTPS; remove PLAN.md and PROMPT_TEMPLATE.md after review. The website
-must not import/link planning documents. No stock screenshot or OG image is supplied as if it were final.
+## Removable `jamstacks/` folder
+
+The `jamstacks/` directory (`config.json`, `screenshots.json`, `home-light.jpg`, `home-dark.jpg`, `config.test.mjs`) exists only for indexing this template in the Jamstacks template gallery. Nothing in the website, `npm run check`, or `.github/workflows/pages.yml` imports or reads `jamstacks/`. Customer websites can delete the entire `jamstacks/` directory safely.
+
+## Before publishing checklist
+
+- [ ] Replace `business.name` in `content/business.ts` and `name` in `site.config.json`.
+- [ ] Replace the sample Times Square address, directions, phone, email, story and weekly hours in `content/business.ts`.
+- [ ] Replace the sample cuts, weights, prices, availability flags, `featuredCutId` and pairings in `content/menu.ts`.
+- [ ] Set your production `domain` and IANA `timeZone` in `site.config.json`.
+- [ ] Delete planning and migration documents (`PLAN.md`, `PROMPT_TEMPLATE.md`, `VALIDATION.md`) and, optionally, the `jamstacks/` gallery folder.
+- [ ] Run `npm run check` and verify every page in light and dark modes.

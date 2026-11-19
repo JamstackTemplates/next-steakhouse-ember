@@ -1,64 +1,54 @@
-# Agent guide: Next.js customer website
+# Agent guide: `next-steakhouse-ember` customer website
 
-## Working preferences
+## 1. Working preferences
 
-Work on the current branch, preserve existing changes and leave changes uncommitted unless asked.
-Do not push, change remote settings or deploy without instructions. Replace sample content with the
-owner's real details. This is a self-contained static website; it does not require the starter or portal
-repository at runtime. See README.md for generation and publishing steps.
+- Work on the current branch, preserve existing user changes and leave your edits uncommitted unless the user explicitly asks you to commit.
+- Do not push, change GitHub settings or deploy unless asked.
+- Replace the fictitious **Cinder & Vesper** sample content (including the 20 Times Square placeholder address, `hello@example.com`, `(212) 555-0148` and sample menu prices) with the owner's real restaurant details when requested.
+- This is a self-contained static website with no runtime dependency on the starter or portal repositories.
 
-## Structure and content
+## 2. Structure and content
 
-`content/business.ts` owns name, introduction, contact and enquiry text. Add typed industry collections
-under content/; most owner requests should be data edits. Document fields and validate IDs, required
-fields, prices, availability and references with item-specific failures. Rename in content and
-site.config.json. Keep the provisioner's config shape: name, description, domain, optional timeZone,
-jamstacks.siteId/cdnUrl and optional provisioningId. Business data never goes there. Reuse the design's
-illustrations and palette rather than adding unrelated assets.
+- **`content/business.ts`** owns the restaurant name (`business.name`), tagline, introduction, public email and phone, story paragraphs, physical address and canonical `mapQuery`, arrival directions, seven-day `openingHours`, manual service `notice`, qualified `amenities`, `privateDining` copy, six visitor `faqs`, `socialLinks` and Contact `enquiries` copy.
+- **`content/menu.ts`** owns `menu` (`currency`, `locale`, `featuredCutId`, `sections`, `extras`, `notes`), `pairings` and `donenessGuide`, plus pure helpers (`getFeaturedCut`, `getSupportingHighlights`, `getPairing`, `getResolvedCutPairings`, `formatPrice`, `formatPriceDisplay`, `isAvailable`, `availabilityLabel`, `getItemIllustrationArt`).
+- Most owner requests ("reprice the ribeye", "mark flat iron sold out", "change the hero cut", "update Sunday hours") are data edits in `content/menu.ts` or `content/business.ts` that never touch React components.
+- Keep all `id` values across sections, menu items, pairings, amenities and FAQs unique and URL-safe (`^[a-z0-9]+(?:-[a-z0-9]+)*$`), as they double as page anchors (`/menu/#ribeye`, `/menu/#cabernet-blend`).
+- Mark temporarily unavailable cuts, dishes or pairings with `available: false` rather than deleting them so the ledger shows `Currently unavailable` honestly. `menu.featuredCutId` must always reference an **available** cut in the `cuts` section, and 1–3 other available items must have `featured: true`.
+- Reuse the token-coloured SVG silhouettes in `components/cut-art.tsx` (`ribeye`, `strip`, `fillet`, `porterhouse`, `flat-iron`, `short-rib`, `vegetable`) and the template palette rather than adding stock photos or external image files.
+- **Never put business or menu content in `site.config.json`.** The Jamstacks provisioner rewrites `site.config.json` wholesale with `name`, `description`, `domain`, optional `timeZone`, `jamstacks.siteId`, `jamstacks.cdnUrl` and optional `provisioningId`. Rename the business in both `content/business.ts` and `site.config.json`.
 
-## Styling: Tailwind CSS v4
+## 3. Styling (Tailwind CSS v4)
 
-Use utilities in components. `app/tailwind.input.css` owns tokens, theme mappings, base styles, small
-shared components and illustration/state rules. Only the template palette exists. Add colour tokens
-in light, media-dark and explicit-dark blocks and map them through @theme inline. Prefer tokens over
-repeated dark: utilities. Restyle the neutral header, footer and PageHead to suit the business.
-Keep semantic headings, keyboard focus, sufficient contrast, a skip link, reduced motion and print styles.
-Map --jamstacks-* and toggle variables; primary fill must support white button text in both modes.
+- Style components with Tailwind utility classes in TSX. `app/tailwind.input.css` owns the colour tokens (`--bg`, `--surface`, `--surface-raised`, `--text`, `--muted`, `--accent`, `--ember`, `--rule`, `--focus`, `--wine`, `--fat`, `--sear`, `--on-accent`), `@theme` font/radius definitions, `@theme inline` colour utility mappings, `--jamstacks-*` variables, base styles and shared ledger building blocks (`.button`, `.button-quiet`, `.text-link`, `.eyebrow`, `.ledger-num`, `.ledger-tag`).
+- Tailwind's default colour palette is disabled (`--color-*: initial`). To add or adjust a colour, define the CSS custom property in all three blocks (`:root`, `@media (prefers-color-scheme: dark) { :root:not(.light) }`, and `:root.dark`) and map it under `@theme inline`. Prefer semantic tokens over `dark:` utilities, and never hard-code hex values in TSX components.
+- Keep `--accent` dark enough in both modes to support white button text (`--on-accent: #FFFFFF`), and ensure all interactive controls have accessible focus indicators (`:focus-visible`), semantic heading hierarchy, no horizontal overflow at 360px–390px, and `prefers-reduced-motion: reduce` support.
 
-## Static architecture
+## 4. Static architecture
 
-Next.js static export only: no production Next server, request-time rendering, Route Handlers,
-Server Actions, middleware or database. Client components are for browser interactions. Read installed
-`node_modules/next/dist/docs/` before changing framework behavior. `lib/config.mjs` is the public
-configuration boundary. Use SiteLink and path helpers for base-path-safe navigation; Contact requires
-full-document navigation both ways. Add routes to sitemap and per-page metadata. Schema lives in
-lib/structured-data.ts, derives from content and escapes inline JSON. Time-dependent text runs only
-in the browser and refreshes every minute; static/no-JS copy stays neutral. Optional hours/maps accept
-content through props; validate schedule boundaries and zone/DST behavior when used. Overnight hours
-are unsupported unless explicitly implemented and tested.
+- Next.js static export only (`output: 'export'`, `trailingSlash: true`, unoptimized images). Do not add Route Handlers, Server Actions, middleware, request-time rendering, databases or a production Next.js server.
+- Use client components (`'use client'`) only for browser-only interactions (`OpenBadge`, `CopyEmail`, `JamstacksSupportForm`, `SiteLink`).
+- Time-dependent text (`OpenBadge`) is computed only in the browser using `site.timeZone` (`America/New_York`) and refreshed every minute; static/no-JS HTML always outputs `"See opening hours"`. Do not build clock-dependent specials or countdowns.
+- Use `SiteLink` and the helpers in `lib/paths.ts` (`route`, `documentHref`, `asset`, `absoluteUrl`) so links and assets work under both root domains and GitHub Pages project base paths (`PAGES_BASE_PATH`).
+- Read `node_modules/next/dist/docs/` before changing Next.js framework configuration.
 
-## Optional Jamstacks form
+## 5. Optional Jamstacks form
 
-Keep the shared component's behavior. Contact alone renders the real support-form host and one site
-bootstrap when a public ID is configured. No ID means visible email fallback with no host/script.
-Email is always visible. The hosted runtime owns fields, validation, submission and results: no local
-custom-element registration, substitute form, submission interception or delivery claims. Only name,
-email and message are supported. Enquiries never imply bookings/orders/payments are confirmed.
-No credentials in config or browser output. Preserve Pages provisioning_id input and correlated run name.
+- Keep `components/jamstacks-support-form.tsx` unchanged in behaviour. Only `/contact/` renders `<jamstacks-support-form>` and loads `{cdn}/sites/{siteId}/embed.js` when a site ID is configured.
+- When no site ID is configured, `/contact/` renders the direct-email fallback and makes no embed script request. Email (`business.email`) and telephone remain visible beside the form in both states.
+- Never register the custom element locally, render a substitute HTML form, intercept submissions or claim that a message was delivered or a table was reserved. The form supports name, email and message only.
+- Keep all config values public; never place secrets or API keys in `site.config.json` or environment variables. Preserve the `.github/workflows/pages.yml` `provisioning_id` dispatch input and correlated `run-name`.
 
-## Commands and checks
+## 6. Commands and checks
 
-Run npm run check after changes, then a project-path export and npm run verify:export with matching
-build environment. Check configured/unconfigured Contact, light/dark at desktop/mobile widths and
-keyboard links. Add meaningful tests for behavior, including frequent owner edits. Report local checks
-separately from deployments or message delivery. Update README when owner-facing behavior changes.
+- Run `npm run check` (`npm test && npm run typecheck && npm run build`) after every change. Test failures in `tests/content.test.ts` and `tests/hours.test.ts` name the exact section, item, pairing, weekday or field to fix.
+- Verify exports in both unconfigured and configured states and with a project base path:
+  - `npm run build && npm run verify:export`
+  - `PAGES_BASE_PATH=/steakhouse-preview JAMSTACKS_SITE=site_test123 npm run build && PAGES_BASE_PATH=/steakhouse-preview JAMSTACKS_SITE=site_test123 npm run verify:export`
+- Visually verify `/`, `/menu/`, `/contact/` and `/404.html` in both light and dark modes at desktop (`1440px`) and mobile (`390px`) widths.
+- Report local verification results separately from live deployment or real form message delivery.
 
-## Template publishing assets
+## 7. Template publishing assets
 
-The entire jamstacks/ folder is source-gallery-only and removable. Customer code, normal tests, builds
-and Pages never import/read it. Keep site.config.json, the form and workflow outside it. Generate real
-light/dark captures after a fresh normal build and run node --test jamstacks/config.test.mjs separately.
-Each new template needs its own business-led layout/fonts/art and OG image; do not ship the neutral
-starter as a final design. Keep planning documents out of the website and remove them before publication
-once reviewed. The starter's generator copies source only and refuses file collisions; reconcile an
-existing README deliberately instead of overwriting user work.
+- The `jamstacks/` directory (`config.json`, `screenshots.json`, `home-light.jpg`, `home-dark.jpg`, `config.test.mjs`) is for the source template gallery only and may be deleted by customers or provisioning.
+- Nothing in `app/`, `components/`, `content/`, `lib/`, `tests/` or `.github/workflows/pages.yml` may import or read from `jamstacks/`, `PLAN.md` or `PROMPT_TEMPLATE.md`.
+- After a fresh normal `npm run build`, capture gallery screenshots and validate `node --test jamstacks/config.test.mjs` separately.

@@ -1,0 +1,22 @@
+{
+  "templateId": "next-steakhouse-ember",
+  "viewport": {
+    "width": 1440,
+    "height": 900
+  },
+  "fullPage": false,
+  "captures": [
+    {
+      "mode": "light",
+      "sha256": "40435b4e4aa42761c749c235a7d87e156f014d45b3add5a0e335065bc72c564b",
+      "file": "jamstacks/home-light.jpg",
+      "bytes": 161870
+    },
+    {
+      "mode": "dark",
+      "sha256": "4da3c26832342f5e0691d5eb516d13870c62232930d50ff2493102e6949c4fce",
+      "file": "jamstacks/home-dark.jpg",
+      "bytes": 154424
+    }
+  ]
+}
